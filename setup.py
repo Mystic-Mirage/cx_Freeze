@@ -31,7 +31,7 @@ class build_ext(distutils.command.build_ext.build_ext):
             if "-mmacosx-version-min=" not in cflags:
                 cflags += "" if cflags == "" else " "
                 cflags += f"-mmacosx-version-min={target}"
-                os.environ["CFLAGS"] = cflags
+                #os.environ["CFLAGS"] = cflags
         os.environ["LD_RUN_PATH"] = "${ORIGIN}/../lib:${ORIGIN}/lib"
         objects = self.compiler.compile(
             ext.sources,
