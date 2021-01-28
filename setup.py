@@ -23,10 +23,17 @@ class build_ext(distutils.command.build_ext.build_ext):
         if WIN32 and self.compiler.compiler_type == "mingw32":
             ext.sources.append("source/bases/manifest.rc")
         if sys.platform == "darwin":
-            if os.environ.get("MACOSX_DEPLOYMENT_TARGET") is None:
-                os.environ["MACOSX_DEPLOYMENT_TARGET"] = (
-                    get_config_var("MACOSX_DEPLOYMENT_TARGET") or "10.13"
-                )
+            macos_target = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
+            if macos_target is None:
+                macos_target = get_config_var("MACOSX_DEPLOYMENT_TARGET")
+                if macos_target is None:
+                    macos_target = "10.13"
+                os.environ["MACOSX_DEPLOYMENT_TARGET"] = macos_target
+            cflags = os.environ.get("CFLAGS", "")
+            if "-mmacosx-version-min=" not in cflags:
+                cflags += "" if cflags == "" else " "
+                cflags += "-mmacosx-version-min=" + macos_target
+                os.environ["CFLAGS"] = cflags
         os.environ["LD_RUN_PATH"] = "${ORIGIN}/../lib:${ORIGIN}/lib"
         objects = self.compiler.compile(
             ext.sources,
