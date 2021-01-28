@@ -65,8 +65,9 @@ class build_ext(distutils.command.build_ext.build_ext):
                 extra_args.extend(get_config_var("LOCALMODLIBS").split())
             # fix a bug using macOS on Github Actions
             if "--with-lto" in get_config_var("CONFIG_ARGS"):
-                extra_args.append("-flto")
-                extra_args.append("-Wl,-export_dynamic")
+                #extra_args.append("-flto")
+                #extra_args.append("-Wl,-export_dynamic")
+                pass
             else:
                 extra_args.append("-s")
         self.compiler.link_executable(
