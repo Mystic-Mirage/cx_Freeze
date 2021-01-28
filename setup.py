@@ -23,16 +23,14 @@ class build_ext(distutils.command.build_ext.build_ext):
         if WIN32 and self.compiler.compiler_type == "mingw32":
             ext.sources.append("source/bases/manifest.rc")
         if sys.platform == "darwin":
-            macos_target = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
-            if macos_target is None:
-                macos_target = get_config_var("MACOSX_DEPLOYMENT_TARGET")
-                if macos_target is None:
-                    macos_target = "10.13"
-                os.environ["MACOSX_DEPLOYMENT_TARGET"] = macos_target
+            target = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
+            if target is None:
+                target = get_config_var("MACOSX_DEPLOYMENT_TARGET") or "10.13"
+                os.environ["MACOSX_DEPLOYMENT_TARGET"] = target
             cflags = os.environ.get("CFLAGS", "")
             if "-mmacosx-version-min=" not in cflags:
                 cflags += "" if cflags == "" else " "
-                cflags += "-mmacosx-version-min=" + macos_target
+                cflags += f"-mmacosx-version-min={target}"
                 os.environ["CFLAGS"] = cflags
         os.environ["LD_RUN_PATH"] = "${ORIGIN}/../lib:${ORIGIN}/lib"
         objects = self.compiler.compile(
@@ -60,6 +58,8 @@ class build_ext(distutils.command.build_ext.build_ext):
                 else:
                     extra_args.append("-mconsole")
                 extra_args.append("-municode")
+        elif sys.platform == "darwin":
+            extra_args.append(f"-mmacosx-version-min={target}")
         else:
             library_dirs.append(get_config_var("LIBPL"))
             abiflags = getattr(sys, "abiflags", "")
