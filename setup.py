@@ -22,6 +22,11 @@ class build_ext(distutils.command.build_ext.build_ext):
             return
         if WIN32 and self.compiler.compiler_type == "mingw32":
             ext.sources.append("source/bases/manifest.rc")
+        if sys.platform == "darwin":
+            if os.environ.get("MACOSX_DEPLOYMENT_TARGET") is None:
+                os.environ["MACOSX_DEPLOYMENT_TARGET"] = (
+                    get_config_var("MACOSX_DEPLOYMENT_TARGET") or "10.13"
+                )
         os.environ["LD_RUN_PATH"] = "${ORIGIN}/../lib:${ORIGIN}/lib"
         objects = self.compiler.compile(
             ext.sources,
