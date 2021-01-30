@@ -26,7 +26,7 @@ class build_ext(distutils.command.build_ext.build_ext):
             target = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
             if target is None:
                 target = get_config_var("MACOSX_DEPLOYMENT_TARGET") or "10.13"
-                os.environ["MACOSX_DEPLOYMENT_TARGET"] = target
+                #os.environ["MACOSX_DEPLOYMENT_TARGET"] = target
             cflags = os.environ.get("CFLAGS", "")
             if "-mmacosx-version-min=" not in cflags:
                 cflags += "" if cflags == "" else " "
