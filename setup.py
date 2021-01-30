@@ -72,6 +72,8 @@ class build_ext(distutils.command.build_ext.build_ext):
                 library_dirs.append(get_config_var("LIBPL"))
                 if get_config_var("LINKFORSHARED") and sys.platform != "darwin":
                     extra_args.extend(get_config_var("LINKFORSHARED").split())
+            else:
+                extra_args.append("-Wl,--no-undefined")
             if get_config_var("LIBS"):
                 extra_args.extend(get_config_var("LIBS").split())
             if get_config_var("LIBM"):
