@@ -58,9 +58,9 @@ class build_ext(distutils.command.build_ext.build_ext):
                 else:
                     extra_args.append("-mconsole")
                 extra_args.append("-municode")
-        elif sys.platform == "darwin":
-            extra_args.append(f"-mmacosx-version-min={target}")
         else:
+            #if sys.platform == "darwin":
+            #    extra_args.append(f"-mmacosx-version-min={target}")
             library_dirs.append(get_config_var("LIBPL"))
             if get_config_var("LINKFORSHARED") and sys.platform != "darwin":
                 extra_args.extend(get_config_var("LINKFORSHARED").split())
