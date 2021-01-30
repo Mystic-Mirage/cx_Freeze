@@ -28,6 +28,7 @@ class build_ext(distutils.command.build_ext.build_ext):
                 target = get_config_var("MACOSX_DEPLOYMENT_TARGET") or "10.13"
                 os.environ["MACOSX_DEPLOYMENT_TARGET"] = target
                 print("***** OS ENVIRON CHANGED *****")
+            print("*** MACOSX_DEPLOYMENT_TARGET", target)
             cflags = os.environ.get("CFLAGS", "")
             if "-mmacosx-version-min=" not in cflags:
                 cflags += "" if cflags == "" else " "
@@ -86,7 +87,7 @@ class build_ext(distutils.command.build_ext.build_ext):
                 abiflags = getattr(sys, "abiflags", "")
                 ver_major, ver_minor = sys.version_info[0:2]
                 libraries.append(f"python{ver_major}.{ver_minor}{abiflags}")
-                print("***** Py_ENABLE_SHARED *****", get_config_var("Py_ENABLE_SHARED"))
+            print("*** Py_ENABLE_SHARED =", get_config_var("Py_ENABLE_SHARED"))
             library_dirs.append(get_config_var("LIBDIR"))
         self.compiler.link_executable(
             objects,
