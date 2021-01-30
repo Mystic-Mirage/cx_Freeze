@@ -82,10 +82,10 @@ class build_ext(distutils.command.build_ext.build_ext):
             # For building extensions with a shared Python library,
             # Python's library directory must be appended to library_dirs
             if int(get_config_var("Py_ENABLE_SHARED") or "0"):
-                library_dirs.append(get_config_var("LIBDIR"))
                 abiflags = getattr(sys, "abiflags", "")
                 ver_major, ver_minor = sys.version_info[0:2]
                 libraries.append(f"python{ver_major}.{ver_minor}{abiflags}")
+            library_dirs.append(get_config_var("LIBDIR"))
         self.compiler.link_executable(
             objects,
             fullname,
