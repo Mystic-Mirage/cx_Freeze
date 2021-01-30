@@ -62,9 +62,6 @@ class build_ext(distutils.command.build_ext.build_ext):
             extra_args.append(f"-mmacosx-version-min={target}")
         else:
             library_dirs.append(get_config_var("LIBPL"))
-            abiflags = getattr(sys, "abiflags", "")
-            ver_major, ver_minor = sys.version_info[0:2]
-            libraries.append(f"python{ver_major}.{ver_minor}{abiflags}")
             if get_config_var("LINKFORSHARED") and sys.platform != "darwin":
                 extra_args.extend(get_config_var("LINKFORSHARED").split())
             if get_config_var("LIBS"):
@@ -82,6 +79,13 @@ class build_ext(distutils.command.build_ext.build_ext):
                 pass
             else:
                 extra_args.append("-s")
+            # For building extensions with a shared Python library,
+            # Python's library directory must be appended to library_dirs
+            if int(get_config_var("Py_ENABLE_SHARED") or "0"):
+                library_dirs.append(get_config_var("LIBDIR"))
+                abiflags = getattr(sys, "abiflags", "")
+                ver_major, ver_minor = sys.version_info[0:2]
+                libraries.append(f"python{ver_major}.{ver_minor}{abiflags}")
         self.compiler.link_executable(
             objects,
             fullname,
