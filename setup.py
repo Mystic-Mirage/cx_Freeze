@@ -89,6 +89,7 @@ class build_ext(distutils.command.build_ext.build_ext):
                 print("***** FLTO ADDED *****")
             else:
                 extra_args.append("-s")
+                extra_args.append("-fno-lto")
             print("*** Py_ENABLE_SHARED =", get_config_var("Py_ENABLE_SHARED"))
             #library_dirs.append(get_config_var("LIBDIR"))
         self.compiler.link_executable(
