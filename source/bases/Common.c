@@ -7,6 +7,7 @@
 #include <eval.h>
 #include <osdefs.h>
 
+#if !defined(CX_PATH_FORMAT)
 // define format for sys.path
 // this consists of <dir>/lib/library.zip and <dir>/lib
 // where <dir> refers to the directory in which the executable is found
@@ -14,6 +15,7 @@
     #define CX_PATH_FORMAT              L"%ls\\lib\\library.zip;%ls\\lib"
 #else
     #define CX_PATH_FORMAT              "%s/lib/library.zip:%s/lib"
+#endif
 #endif
 
 // global variables (used for simplicity)

@@ -131,7 +131,13 @@ if __name__ == "__main__":
         depends=depends,
         libraries=libraries,
     )
-    extensions = [console]
+    console_lib = Extension(
+        "cx_Freeze.bases.ConsoleLib",
+        ["source/bases/ConsoleLib.c"],
+        depends=depends + ["source/bases/Console.c"],
+        libraries=libraries,
+    )
+    extensions = [console, console_lib]
     if WIN32:
         gui = Extension(
             "cx_Freeze.bases.Win32GUI",
