@@ -902,10 +902,6 @@ class Executable:
             else:
                 ext = ""
 
-        if os.path.splitext(os.path.basename(self._base))[0] == "ConsoleLib":
-            name = os.path.join("lib", name)
-
-        self._name = name
         self._ext = ext
         name = name.partition(".")[0]
         if not name.isidentifier():
@@ -913,8 +909,13 @@ class Executable:
                 name = name.replace(ch, "_")
         name = os.path.normcase(name)
         if not name.isidentifier():
-            raise ConfigError(f"Invalid name for target_name ({self._name!r})")
+            raise ConfigError(f"Invalid name for target_name ({name!r})")
         self._internal_name = name
+
+        if os.path.splitext(os.path.basename(self._base))[0] == "ConsoleLib":
+            name = os.path.join("lib", name)
+
+        self._name = name
 
 
 class ConstantsModule:
