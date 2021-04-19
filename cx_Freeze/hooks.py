@@ -208,7 +208,7 @@ def load_asyncio(finder: ModuleFinder, module: Module) -> None:
 def load_babel(finder: ModuleFinder, module: Module) -> None:
     """The babel must be loaded as a package, and has pickeable data."""
     finder.IncludePackage("babel")
-    module.store_in_file_system = True
+    module.in_file_system = True
 
 
 def load_bcrypt(finder: ModuleFinder, module: Module) -> None:
@@ -241,7 +241,7 @@ def load_certifi(finder: ModuleFinder, module: Module) -> None:
     """
     if not module.in_file_system:
         if sys.version_info < (3, 7):
-            module.store_in_file_system = True
+            module.in_file_system = True
             return
         cacert = __import__("certifi").where()
         target = "certifi/" + os.path.basename(cacert)
@@ -387,7 +387,7 @@ def load_docutils_frontend(finder: ModuleFinder, module: Module) -> None:
     The optik module is the old name for the optparse module; ignore the
     module if it cannot be found.
     """
-    module.IgnoreName("optik")
+    module.ignore_names.add("optik")
 
 
 def load_dummy_threading(finder: ModuleFinder, module: Module) -> None:
@@ -403,7 +403,7 @@ def load_ftplib(finder: ModuleFinder, module: Module) -> None:
     The ftplib module attempts to import the SOCKS module; ignore this
     module if it cannot be found.
     """
-    module.IgnoreName("SOCKS")
+    module.ignore_names.add("SOCKS")
 
 
 def load_gevent(finder: ModuleFinder, module: Module) -> None:
@@ -413,83 +413,87 @@ def load_gevent(finder: ModuleFinder, module: Module) -> None:
 
 def load_GifImagePlugin(finder: ModuleFinder, module: Module) -> None:
     """The GifImagePlugin module optionally imports the _imaging_gif module"""
-    module.IgnoreName("_imaging_gif")
+    module.ignore_names.add("_imaging_gif")
 
 
 def load_glib(finder: ModuleFinder, module: Module) -> None:
     """Ignore globals that are imported."""
-    module.AddGlobalName("GError")
-    module.AddGlobalName("IOChannel")
-    module.AddGlobalName("IO_ERR")
-    module.AddGlobalName("IO_FLAG_APPEND")
-    module.AddGlobalName("IO_FLAG_GET_MASK")
-    module.AddGlobalName("IO_FLAG_IS_READABLE")
-    module.AddGlobalName("IO_FLAG_IS_SEEKABLE")
-    module.AddGlobalName("IO_FLAG_IS_WRITEABLE")
-    module.AddGlobalName("IO_FLAG_MASK")
-    module.AddGlobalName("IO_FLAG_NONBLOCK")
-    module.AddGlobalName("IO_FLAG_SET_MASK")
-    module.AddGlobalName("IO_HUP")
-    module.AddGlobalName("IO_IN")
-    module.AddGlobalName("IO_NVAL")
-    module.AddGlobalName("IO_OUT")
-    module.AddGlobalName("IO_PRI")
-    module.AddGlobalName("IO_STATUS_AGAIN")
-    module.AddGlobalName("IO_STATUS_EOF")
-    module.AddGlobalName("IO_STATUS_ERROR")
-    module.AddGlobalName("IO_STATUS_NORMAL")
-    module.AddGlobalName("Idle")
-    module.AddGlobalName("MainContext")
-    module.AddGlobalName("MainLoop")
-    module.AddGlobalName("OPTION_ERROR")
-    module.AddGlobalName("OPTION_ERROR_BAD_VALUE")
-    module.AddGlobalName("OPTION_ERROR_FAILED")
-    module.AddGlobalName("OPTION_ERROR_UNKNOWN_OPTION")
-    module.AddGlobalName("OPTION_FLAG_FILENAME")
-    module.AddGlobalName("OPTION_FLAG_HIDDEN")
-    module.AddGlobalName("OPTION_FLAG_IN_MAIN")
-    module.AddGlobalName("OPTION_FLAG_NOALIAS")
-    module.AddGlobalName("OPTION_FLAG_NO_ARG")
-    module.AddGlobalName("OPTION_FLAG_OPTIONAL_ARG")
-    module.AddGlobalName("OPTION_FLAG_REVERSE")
-    module.AddGlobalName("OPTION_REMAINING")
-    module.AddGlobalName("OptionContext")
-    module.AddGlobalName("OptionGroup")
-    module.AddGlobalName("PRIORITY_DEFAULT")
-    module.AddGlobalName("PRIORITY_DEFAULT_IDLE")
-    module.AddGlobalName("PRIORITY_HIGH")
-    module.AddGlobalName("PRIORITY_HIGH_IDLE")
-    module.AddGlobalName("PRIORITY_LOW")
-    module.AddGlobalName("Pid")
-    module.AddGlobalName("PollFD")
-    module.AddGlobalName("SPAWN_CHILD_INHERITS_STDIN")
-    module.AddGlobalName("SPAWN_DO_NOT_REAP_CHILD")
-    module.AddGlobalName("SPAWN_FILE_AND_ARGV_ZERO")
-    module.AddGlobalName("SPAWN_LEAVE_DESCRIPTORS_OPEN")
-    module.AddGlobalName("SPAWN_SEARCH_PATH")
-    module.AddGlobalName("SPAWN_STDERR_TO_DEV_NULL")
-    module.AddGlobalName("SPAWN_STDOUT_TO_DEV_NULL")
-    module.AddGlobalName("Source")
-    module.AddGlobalName("Timeout")
-    module.AddGlobalName("child_watch_add")
-    module.AddGlobalName("filename_display_basename")
-    module.AddGlobalName("filename_display_name")
-    module.AddGlobalName("filename_from_utf8")
-    module.AddGlobalName("get_application_name")
-    module.AddGlobalName("get_current_time")
-    module.AddGlobalName("get_prgname")
-    module.AddGlobalName("glib_version")
-    module.AddGlobalName("idle_add")
-    module.AddGlobalName("io_add_watch")
-    module.AddGlobalName("main_context_default")
-    module.AddGlobalName("main_depth")
-    module.AddGlobalName("markup_escape_text")
-    module.AddGlobalName("set_application_name")
-    module.AddGlobalName("set_prgname")
-    module.AddGlobalName("source_remove")
-    module.AddGlobalName("spawn_async")
-    module.AddGlobalName("timeout_add")
-    module.AddGlobalName("timeout_add_seconds")
+    module.global_names.update(
+        [
+            "GError",
+            "IOChannel",
+            "IO_ERR",
+            "IO_FLAG_APPEND",
+            "IO_FLAG_GET_MASK",
+            "IO_FLAG_IS_READABLE",
+            "IO_FLAG_IS_SEEKABLE",
+            "IO_FLAG_IS_WRITEABLE",
+            "IO_FLAG_MASK",
+            "IO_FLAG_NONBLOCK",
+            "IO_FLAG_SET_MASK",
+            "IO_HUP",
+            "IO_IN",
+            "IO_NVAL",
+            "IO_OUT",
+            "IO_PRI",
+            "IO_STATUS_AGAIN",
+            "IO_STATUS_EOF",
+            "IO_STATUS_ERROR",
+            "IO_STATUS_NORMAL",
+            "Idle",
+            "MainContext",
+            "MainLoop",
+            "OPTION_ERROR",
+            "OPTION_ERROR_BAD_VALUE",
+            "OPTION_ERROR_FAILED",
+            "OPTION_ERROR_UNKNOWN_OPTION",
+            "OPTION_FLAG_FILENAME",
+            "OPTION_FLAG_HIDDEN",
+            "OPTION_FLAG_IN_MAIN",
+            "OPTION_FLAG_NOALIAS",
+            "OPTION_FLAG_NO_ARG",
+            "OPTION_FLAG_OPTIONAL_ARG",
+            "OPTION_FLAG_REVERSE",
+            "OPTION_REMAINING",
+            "OptionContext",
+            "OptionGroup",
+            "PRIORITY_DEFAULT",
+            "PRIORITY_DEFAULT_IDLE",
+            "PRIORITY_HIGH",
+            "PRIORITY_HIGH_IDLE",
+            "PRIORITY_LOW",
+            "Pid",
+            "PollFD",
+            "SPAWN_CHILD_INHERITS_STDIN",
+            "SPAWN_DO_NOT_REAP_CHILD",
+            "SPAWN_FILE_AND_ARGV_ZERO",
+            "SPAWN_LEAVE_DESCRIPTORS_OPEN",
+            "SPAWN_SEARCH_PATH",
+            "SPAWN_STDERR_TO_DEV_NULL",
+            "SPAWN_STDOUT_TO_DEV_NULL",
+            "Source",
+            "Timeout",
+            "child_watch_add",
+            "filename_display_basename",
+            "filename_display_name",
+            "filename_from_utf8",
+            "get_application_name",
+            "get_current_time",
+            "get_prgname",
+            "glib_version",
+            "idle_add",
+            "io_add_watch",
+            "main_context_default",
+            "main_depth",
+            "markup_escape_text",
+            "set_application_name",
+            "set_prgname",
+            "source_remove",
+            "spawn_async",
+            "timeout_add",
+            "timeout_add_seconds",
+        ]
+    )
 
 
 def load_google_cloud_storage(finder: ModuleFinder, module: Module) -> None:
@@ -511,10 +515,7 @@ def load_hashlib(finder: ModuleFinder, module: Module) -> None:
     hashlib's fallback modules don't exist if the equivalent OpenSSL
     algorithms are loaded from _hashlib, so we can ignore the error.
     """
-    module.IgnoreName("_md5")
-    module.IgnoreName("_sha")
-    module.IgnoreName("_sha256")
-    module.IgnoreName("_sha512")
+    module.ignore_names.update(["_md5", "_sha", "_sha256", "_sha512"])
 
 
 def load_h5py(finder: ModuleFinder, module: Module) -> None:
@@ -525,7 +526,7 @@ def load_h5py(finder: ModuleFinder, module: Module) -> None:
     try:
         api_gen = __import__("h5py", fromlist=["api_gen"]).api_gen
         finder.IncludeModule(api_gen.__name__)
-    except ImportError:
+    except (ImportError, AttributeError):
         pass
     finder.IncludeModule("h5py._errors")
     finder.IncludeModule("h5py.h5ac")
@@ -541,20 +542,33 @@ def load_lxml(finder: ModuleFinder, module: Module) -> None:
     finder.IncludeModule("lxml._elementpath")
 
 
+def load_llvmlite(finder: ModuleFinder, module: Module) -> None:
+    """The llvmlite must be loaded as package."""
+    finder.IncludePackage("llvmlite")
+    finder.ExcludeModule("llvmlite.tests")
+
+
 def load_matplotlib(finder: ModuleFinder, module: Module) -> None:
-    """
-    The matplotlib package requires mpl-data in a subdirectory of the
-    package.
-    """
-    MATPLOTLIB_CODE_STR = """
-def _get_data_path():
-    return os.path.join(os.path.dirname(sys.executable), '{}')
-"""
-    data_path = __import__("matplotlib").get_data_path()
+    """The matplotlib package requires mpl-data subdirectory."""
+    data_path = os.path.join(module.path[0], "mpl-data")
     target_path = os.path.join("lib", module.name, "mpl-data")
+    # After matplotlib 3.4 mpl-data is guaranteed to be a subdirectory.
+    if not os.path.isdir(data_path):
+        data_path = __import__("matplotlib").get_data_path()
+        need_patch = True
+    else:
+        need_patch = not module.in_file_system
     finder.IncludeFiles(data_path, target_path, copy_dependent_files=False)
-    if module.code is not None:
-        code_str = MATPLOTLIB_CODE_STR.format(target_path)
+    finder.IncludePackage("matplotlib")
+    finder.ExcludeModule("matplotlib.tests")
+    finder.ExcludeModule("matplotlib.testing")
+    if not need_patch or module.code is None:
+        return
+    CODE_STR = f"""
+def _get_data_path():
+    return os.path.join(os.path.dirname(sys.executable), "{target_path}")
+"""
+    for code_str in [CODE_STR, CODE_STR.replace("_get_data_", "get_data_")]:
         new_code = compile(code_str, module.file, "exec")
         co_func = new_code.co_consts[0]
         name = co_func.co_name
@@ -565,21 +579,29 @@ def _get_data_path():
                 consts[i] = co_func
                 break
         module.code = code_object_replace(code, co_consts=consts)
-    finder.ExcludeModule("matplotlib.tests")
-    finder.IncludePackage("matplotlib")
+
+
+def load_mkl(finder: ModuleFinder, module: Module) -> None:
+    """The mkl package in conda."""
+    libs_dir = os.path.join(sys.base_prefix, "Library", "bin")
+    if os.path.isdir(libs_dir):
+        for dll_path in glob.glob(os.path.join(libs_dir, "mkl_*.dll")):
+            dll_name = os.path.basename(dll_path)
+            finder.IncludeFiles(dll_path, os.path.join("lib", "mkl", dll_name))
+        for dll_path in glob.glob(os.path.join(libs_dir, "libiomp*.dll")):
+            dll_name = os.path.basename(dll_path)
+            finder.IncludeFiles(dll_path, os.path.join("lib", "mkl", dll_name))
 
 
 def load_numpy(finder: ModuleFinder, module: Module) -> None:
     """The numpy must be loaded as a package."""
-    finder.ExcludeModule("numpy.random._examples")
     finder.IncludePackage("numpy")
-    if not module.in_file_system:
-        # version 1.18.3+ changed the location of dll/so
-        numpy = __import__("numpy")
-        version = tuple([int(n) for n in numpy.__version__.split(".")])
-        del numpy
-        if version >= (1, 18, 3):
-            module.store_in_file_system = True
+    finder.ExcludeModule("numpy.random._examples")
+    if WIN32 and not module.in_file_system:
+        # copy any file at site-packages/numpy/.libs
+        libs_dir = os.path.join(module.path[0], ".libs")
+        if os.path.exists(libs_dir):
+            finder.IncludeFiles(libs_dir, "lib")
 
 
 def load_numpy_core_multiarray(finder: ModuleFinder, module: Module) -> None:
@@ -589,7 +611,7 @@ def load_numpy_core_multiarray(finder: ModuleFinder, module: Module) -> None:
     available to this module in order to avoid spurious errors about missing
     modules.
     """
-    module.AddGlobalName("arange")
+    module.global_names.add("arange")
 
 
 def load_numpy_core_numerictypes(finder: ModuleFinder, module: Module) -> None:
@@ -598,18 +620,22 @@ def load_numpy_core_numerictypes(finder: ModuleFinder, module: Module) -> None:
     dynamically; define these to avoid spurious errors about missing
     modules.
     """
-    module.AddGlobalName("bool_")
-    module.AddGlobalName("cdouble")
-    module.AddGlobalName("complexfloating")
-    module.AddGlobalName("csingle")
-    module.AddGlobalName("double")
-    module.AddGlobalName("float64")
-    module.AddGlobalName("float_")
-    module.AddGlobalName("inexact")
-    module.AddGlobalName("intc")
-    module.AddGlobalName("int32")
-    module.AddGlobalName("number")
-    module.AddGlobalName("single")
+    module.global_names.update(
+        [
+            "bool_",
+            "cdouble",
+            "complexfloating",
+            "csingle",
+            "double",
+            "float64",
+            "float_",
+            "inexact",
+            "intc",
+            "int32",
+            "number",
+            "single",
+        ]
+    )
 
 
 def load_numpy_core_umath(finder: ModuleFinder, module: Module) -> None:
@@ -619,53 +645,57 @@ def load_numpy_core_umath(finder: ModuleFinder, module: Module) -> None:
     to this module in order to avoid spurious errors about missing
     modules.
     """
-    module.AddGlobalName("add")
-    module.AddGlobalName("absolute")
-    module.AddGlobalName("arccos")
-    module.AddGlobalName("arccosh")
-    module.AddGlobalName("arcsin")
-    module.AddGlobalName("arcsinh")
-    module.AddGlobalName("arctan")
-    module.AddGlobalName("arctanh")
-    module.AddGlobalName("bitwise_and")
-    module.AddGlobalName("bitwise_or")
-    module.AddGlobalName("bitwise_xor")
-    module.AddGlobalName("ceil")
-    module.AddGlobalName("conj")
-    module.AddGlobalName("conjugate")
-    module.AddGlobalName("cosh")
-    module.AddGlobalName("divide")
-    module.AddGlobalName("fabs")
-    module.AddGlobalName("floor")
-    module.AddGlobalName("floor_divide")
-    module.AddGlobalName("fmod")
-    module.AddGlobalName("greater")
-    module.AddGlobalName("hypot")
-    module.AddGlobalName("invert")
-    module.AddGlobalName("isfinite")
-    module.AddGlobalName("isinf")
-    module.AddGlobalName("isnan")
-    module.AddGlobalName("less")
-    module.AddGlobalName("left_shift")
-    module.AddGlobalName("log")
-    module.AddGlobalName("logical_and")
-    module.AddGlobalName("logical_not")
-    module.AddGlobalName("logical_or")
-    module.AddGlobalName("logical_xor")
-    module.AddGlobalName("maximum")
-    module.AddGlobalName("minimum")
-    module.AddGlobalName("multiply")
-    module.AddGlobalName("negative")
-    module.AddGlobalName("not_equal")
-    module.AddGlobalName("power")
-    module.AddGlobalName("remainder")
-    module.AddGlobalName("right_shift")
-    module.AddGlobalName("sign")
-    module.AddGlobalName("sinh")
-    module.AddGlobalName("sqrt")
-    module.AddGlobalName("tan")
-    module.AddGlobalName("tanh")
-    module.AddGlobalName("true_divide")
+    module.global_names.update(
+        [
+            "add",
+            "absolute",
+            "arccos",
+            "arccosh",
+            "arcsin",
+            "arcsinh",
+            "arctan",
+            "arctanh",
+            "bitwise_and",
+            "bitwise_or",
+            "bitwise_xor",
+            "ceil",
+            "conj",
+            "conjugate",
+            "cosh",
+            "divide",
+            "fabs",
+            "floor",
+            "floor_divide",
+            "fmod",
+            "greater",
+            "hypot",
+            "invert",
+            "isfinite",
+            "isinf",
+            "isnan",
+            "less",
+            "left_shift",
+            "log",
+            "logical_and",
+            "logical_not",
+            "logical_or",
+            "logical_xor",
+            "maximum",
+            "minimum",
+            "multiply",
+            "negative",
+            "not_equal",
+            "power",
+            "remainder",
+            "right_shift",
+            "sign",
+            "sinh",
+            "sqrt",
+            "tan",
+            "tanh",
+            "true_divide",
+        ]
+    )
 
 
 def load_numpy_distutils_command_scons(
@@ -675,7 +705,7 @@ def load_numpy_distutils_command_scons(
     The numpy.distutils.command.scons module optionally imports the numscons
     module; ignore the error if the module cannot be found.
     """
-    module.IgnoreName("numscons")
+    module.ignore_names.add("numscons")
 
 
 def load_numpy_distutils_misc_util(
@@ -685,7 +715,7 @@ def load_numpy_distutils_misc_util(
     The numpy.distutils.misc_util module optionally imports the numscons
     module; ignore the error if the module cannot be found.
     """
-    module.IgnoreName("numscons")
+    module.ignore_names.add("numscons")
 
 
 def load_numpy_distutils_system_info(
@@ -695,7 +725,7 @@ def load_numpy_distutils_system_info(
     The numpy.distutils.system_info module optionally imports the Numeric
     module; ignore the error if the module cannot be found.
     """
-    module.IgnoreName("Numeric")
+    module.ignore_names.add("Numeric")
 
 
 def load_numpy_f2py___version__(finder: ModuleFinder, module: Module) -> None:
@@ -703,7 +733,7 @@ def load_numpy_f2py___version__(finder: ModuleFinder, module: Module) -> None:
     The numpy.f2py.__version__ module optionally imports the __svn_version__
     module; ignore the error if the module cannot be found.
     """
-    module.IgnoreName("__svn_version__")
+    module.ignore_names.add("__svn_version__")
 
 
 def load_numpy_linalg(finder: ModuleFinder, module: Module) -> None:
@@ -721,8 +751,7 @@ def load_numpy_random_mtrand(finder: ModuleFinder, module: Module) -> None:
     available to this module in order to avoid spurious errors about missing
     modules.
     """
-    module.AddGlobalName("rand")
-    module.AddGlobalName("randn")
+    module.global_names.update(["rand", "randn"])
 
 
 def load_Numeric(finder: ModuleFinder, module: Module) -> None:
@@ -730,7 +759,13 @@ def load_Numeric(finder: ModuleFinder, module: Module) -> None:
     The Numeric module optionally loads the dotblas module; ignore the error
     if this modules does not exist.
     """
-    module.IgnoreName("dotblas")
+    module.ignore_names.add("dotblas")
+
+
+def load_pandas(finder: ModuleFinder, module: Module) -> None:
+    """The pandas has dynamic imports."""
+    finder.IncludePackage("pandas._libs")
+    finder.ExcludeModule("pandas.tests")
 
 
 def load_pikepdf(finder: ModuleFinder, module: Module) -> None:
@@ -762,7 +797,16 @@ def load_postgresql_lib(finder: ModuleFinder, module: Module) -> None:
 
 def load_pty(finder: ModuleFinder, module: Module) -> None:
     """The sgi module is not needed for this module to function."""
-    module.IgnoreName("sgi")
+    module.ignore_names.add("sgi")
+
+
+def load_pycountry(finder: ModuleFinder, module: Module) -> None:
+    """
+    The pycountry module has data in subdirectories.
+    """
+    finder.ExcludeModule("pycountry.tests")
+    if not module.in_file_system:
+        module.in_file_system = True
 
 
 def load_pycparser(finder: ModuleFinder, module: Module) -> None:
@@ -781,7 +825,194 @@ def load_pygments(finder: ModuleFinder, module: Module) -> None:
     finder.IncludePackage("pygments.formatters")
 
 
+def load_pyodbc(finder: ModuleFinder, module: Module) -> None:
+    """
+    The pyodbc module implicitly imports others modules;
+    make sure this happens.
+    """
+    for mod in ("datetime", "decimal", "hashlib", "locale", "uuid"):
+        finder.IncludeModule(mod)
+
+
+# cache the QtCore module
+_qtcore = None
+
+
+def _qt_implementation(module: Module) -> Tuple[str, Any]:
+    """Helper function to get name (PyQt5) and the QtCore module."""
+    global _qtcore
+    name = module.name.split(".")[0]
+    if _qtcore is None:
+        try:
+            _qtcore = __import__(name, fromlist=["QtCore"]).QtCore
+        except RuntimeError:
+            print(
+                "WARNING: Tried to load multiple incompatible Qt wrappers. "
+                "Some incorrect files may be copied."
+            )
+    return name, _qtcore
+
+
+def copy_qt_plugins(plugins, finder, qtcore):
+    """Helper function to find and copy Qt plugins."""
+
+    # Qt Plugins can either be in a plugins directory next to the Qt libraries,
+    # or in other locations listed by QCoreApplication.libraryPaths()
+    dir0 = os.path.join(os.path.dirname(qtcore.__file__), "plugins")
+    for libpath in qtcore.QCoreApplication.libraryPaths() + [dir0]:
+        sourcepath = os.path.join(str(libpath), plugins)
+        if os.path.exists(sourcepath):
+            finder.IncludeFiles(sourcepath, plugins)
+
+
+def sip_module_name(qtcore) -> str:
+    """
+    Returns the name of the sip module to import.
+    (As of 5.11, the distributed wheels no longer provided for the sip module
+    outside of the PyQt5 namespace).
+    """
+    version_string = qtcore.PYQT_VERSION_STR
+    try:
+        pyqt_version_ints = tuple(int(c) for c in version_string.split("."))
+        if pyqt_version_ints >= (5, 11):
+            return "PyQt5.sip"
+    except Exception:
+        pass
+    return "sip"
+
+
+def load_PyQt5_phonon(finder: ModuleFinder, module: Module) -> None:
+    """
+    In Windows, phonon5.dll requires an additional dll phonon_ds94.dll to
+    be present in the build directory inside a folder phonon_backend.
+    """
+    if module.in_file_system:
+        return
+    _, qtcore = _qt_implementation(module)
+    if WIN32:
+        copy_qt_plugins("phonon_backend", finder, qtcore)
+
+
+def load_PyQt5_Qt(finder: ModuleFinder, module: Module) -> None:
+    """
+    The PyQt5.Qt module is an extension module which imports a number of
+    other modules and injects their namespace into its own. It seems a
+    foolish way of doing things but perhaps there is some hidden advantage
+    to this technique over pure Python; ignore the absence of some of
+    the modules since not every installation includes all of them.
+    """
+    if module.in_file_system:
+        return
+    name, _ = _qt_implementation(module)
+    finder.IncludeModule(f"{name}.QtCore")
+    finder.IncludeModule(f"{name}.QtGui")
+    for mod in (
+        "_qt",
+        "QtSvg",
+        "Qsci",
+        "QtAssistant",
+        "QtNetwork",
+        "QtOpenGL",
+        "QtScript",
+        "QtSql",
+        "QtSvg",
+        "QtTest",
+        "QtXml",
+    ):
+        try:
+            finder.IncludeModule(f"{name}.{mod}")
+        except ImportError:
+            pass
+
+
+def load_PyQt5_QtCore(finder: ModuleFinder, module: Module) -> None:
+    """
+    The PyQt5.QtCore module implicitly imports the sip module and,
+    depending on configuration, the PyQt5._qt module.
+    """
+    if module.in_file_system:
+        return
+    name, qtcore = _qt_implementation(module)
+    finder.IncludeModule(sip_module_name(qtcore))
+    try:
+        finder.IncludeModule(f"{name}._qt")
+    except ImportError:
+        pass
+
+
+def load_PyQt5_uic(finder: ModuleFinder, module: Module) -> None:
+    """
+    The uic module makes use of "plugins" that need to be read directly and
+    cannot be frozen; the PyQt5.QtWebKit and PyQt5.QtNetwork modules are
+    also implicity loaded.
+    """
+    if module.in_file_system:
+        return
+    name, _ = _qt_implementation(module)
+    source_dir = os.path.join(module.path[0], "widget-plugins")
+    finder.IncludeFiles(source_dir, f"{name}.uic.widget-plugins")
+    finder.IncludeModule(f"{name}.QtNetwork")
+    try:
+        finder.IncludeModule(f"{name}.QtWebKit")
+    except ImportError:
+        pass
+
+
+def load_PyQt5_QtGui(finder: ModuleFinder, module: Module) -> None:
+    """
+    There is a chance that GUI will use some image formats
+    add the image format plugins.
+    """
+    if module.in_file_system:
+        return
+    name, qtcore = _qt_implementation(module)
+    finder.IncludeModule(f"{name}.QtCore")
+    copy_qt_plugins("imageformats", finder, qtcore)
+    # On Qt5, we need the platform plugins. For simplicity, we just copy
+    # any that are installed.
+    copy_qt_plugins("platforms", finder, qtcore)
+
+
+def load_PyQt5_QtMultimedia(finder: ModuleFinder, module: Module) -> None:
+    if module.in_file_system:
+        return
+    name, qtcore = _qt_implementation(module)
+    finder.IncludeModule(f"{name}.QtCore")
+    finder.IncludeModule(f"{name}.QtMultimediaWidgets")
+    copy_qt_plugins("mediaservice", finder, qtcore)
+
+
+def load_PyQt5_QtPrintSupport(finder: ModuleFinder, module: Module) -> None:
+    if module.in_file_system:
+        return
+    _, qtcore = _qt_implementation(module)
+    copy_qt_plugins("printsupport", finder, qtcore)
+
+
+def load_PyQt5_QtWebKit(finder: ModuleFinder, module: Module) -> None:
+    if module.in_file_system:
+        return
+    name, _ = _qt_implementation(module)
+    finder.IncludeModule(f"{name}.QtNetwork")
+    finder.IncludeModule(f"{name}.QtGui")
+
+
+def load_PyQt5_QtWidgets(finder: ModuleFinder, module: Module) -> None:
+    if module.in_file_system:
+        return
+    finder.IncludeModule("PyQt5.QtGui")
+
+
+def load_pyqtgraph(finder: ModuleFinder, module: Module) -> None:
+    """The pyqtgraph package must be loaded as a package."""
+    finder.IncludePackage("pyqtgraph")
+
+
 def load_pytest(finder: ModuleFinder, module: Module) -> None:
+    """
+    The pytest package implicitly imports others modules;
+    make sure this happens.
+    """
     pytest = __import__("pytest")
     for mod in pytest.freeze_includes():
         finder.IncludeModule(mod)
@@ -848,181 +1079,6 @@ def load_pywintypes(finder: ModuleFinder, module: Module) -> None:
     )
 
 
-# cache the QtCore module
-_qtcore = None
-
-
-def _qt_implementation(module: Module) -> Tuple[str, Any]:
-    """Helper function to get name (PyQt5) and the QtCore module."""
-    global _qtcore
-    name = module.name.split(".")[0]
-    if _qtcore is None:
-        try:
-            _qtcore = __import__(name, fromlist=["QtCore"]).QtCore
-        except RuntimeError:
-            print(
-                "WARNING: Tried to load multiple incompatible Qt wrappers. "
-                "Some incorrect files may be copied."
-            )
-    return name, _qtcore
-
-
-def copy_qt_plugins(plugins, finder, qtcore):
-    """Helper function to find and copy Qt plugins."""
-
-    # Qt Plugins can either be in a plugins directory next to the Qt libraries,
-    # or in other locations listed by QCoreApplication.libraryPaths()
-    dir0 = os.path.join(os.path.dirname(qtcore.__file__), "plugins")
-    for libpath in qtcore.QCoreApplication.libraryPaths() + [dir0]:
-        sourcepath = os.path.join(str(libpath), plugins)
-        if os.path.exists(sourcepath):
-            finder.IncludeFiles(sourcepath, plugins)
-
-
-def load_PyQt5_phonon(finder: ModuleFinder, module: Module) -> None:
-    """
-    In Windows, phonon5.dll requires an additional dll phonon_ds94.dll to
-    be present in the build directory inside a folder phonon_backend.
-    """
-    if module.in_file_system:
-        return
-    _, qtcore = _qt_implementation(module)
-    if WIN32:
-        copy_qt_plugins("phonon_backend", finder, qtcore)
-
-
-def sip_module_name(qtcore) -> str:
-    """
-    Returns the name of the sip module to import.
-    (As of 5.11, the distributed wheels no longer provided for the sip module
-    outside of the PyQt5 namespace).
-    """
-    version_string = qtcore.PYQT_VERSION_STR
-    try:
-        pyqt_version_ints = tuple(int(c) for c in version_string.split("."))
-        if pyqt_version_ints >= (5, 11):
-            return "PyQt5.sip"
-    except Exception:
-        pass
-    return "sip"
-
-
-def load_PyQt5_QtCore(finder: ModuleFinder, module: Module) -> None:
-    """
-    The PyQt5.QtCore module implicitly imports the sip module and,
-    depending on configuration, the PyQt5._qt module.
-    """
-    if module.in_file_system:
-        return
-    name, qtcore = _qt_implementation(module)
-    finder.IncludeModule(sip_module_name(qtcore))
-    try:
-        finder.IncludeModule(f"{name}._qt")
-    except ImportError:
-        pass
-
-
-def load_PyQt5_Qt(finder: ModuleFinder, module: Module) -> None:
-    """
-    The PyQt5.Qt module is an extension module which imports a number of
-    other modules and injects their namespace into its own. It seems a
-    foolish way of doing things but perhaps there is some hidden advantage
-    to this technique over pure Python; ignore the absence of some of
-    the modules since not every installation includes all of them.
-    """
-    if module.in_file_system:
-        return
-    name, _ = _qt_implementation(module)
-    finder.IncludeModule(f"{name}.QtCore")
-    finder.IncludeModule(f"{name}.QtGui")
-    for mod in (
-        "_qt",
-        "QtSvg",
-        "Qsci",
-        "QtAssistant",
-        "QtNetwork",
-        "QtOpenGL",
-        "QtScript",
-        "QtSql",
-        "QtSvg",
-        "QtTest",
-        "QtXml",
-    ):
-        try:
-            finder.IncludeModule(f"{name}.{mod}")
-        except ImportError:
-            pass
-
-
-def load_PyQt5_uic(finder: ModuleFinder, module: Module) -> None:
-    """
-    The uic module makes use of "plugins" that need to be read directly and
-    cannot be frozen; the PyQt5.QtWebKit and PyQt5.QtNetwork modules are
-    also implicity loaded.
-    """
-    if module.in_file_system:
-        return
-    name, _ = _qt_implementation(module)
-    source_dir = os.path.join(module.path[0], "widget-plugins")
-    finder.IncludeFiles(source_dir, f"{name}.uic.widget-plugins")
-    finder.IncludeModule(f"{name}.QtNetwork")
-    try:
-        finder.IncludeModule(f"{name}.QtWebKit")
-    except ImportError:
-        pass
-
-
-def _QtGui(finder, module, version_str):
-    name, qtcore = _qt_implementation(module)
-    finder.IncludeModule(f"{name}.QtCore")
-    copy_qt_plugins("imageformats", finder, qtcore)
-    if version_str >= "5":
-        # On Qt5, we need the platform plugins. For simplicity, we just copy
-        # any that are installed.
-        copy_qt_plugins("platforms", finder, qtcore)
-
-
-def load_PyQt5_QtGui(finder: ModuleFinder, module: Module) -> None:
-    """
-    There is a chance that GUI will use some image formats
-    add the image format plugins.
-    """
-    if module.in_file_system:
-        return
-    _, qtcore = _qt_implementation(module)
-    _QtGui(finder, module, qtcore.QT_VERSION_STR)
-
-
-def load_PyQt5_QtWidgets(finder: ModuleFinder, module: Module) -> None:
-    if module.in_file_system:
-        return
-    finder.IncludeModule("PyQt5.QtGui")
-
-
-def load_PyQt5_QtWebKit(finder: ModuleFinder, module: Module) -> None:
-    if module.in_file_system:
-        return
-    name, _ = _qt_implementation(module)
-    finder.IncludeModule(f"{name}.QtNetwork")
-    finder.IncludeModule(f"{name}.QtGui")
-
-
-def load_PyQt5_QtMultimedia(finder: ModuleFinder, module: Module) -> None:
-    if module.in_file_system:
-        return
-    name, qtcore = _qt_implementation(module)
-    finder.IncludeModule(f"{name}.QtCore")
-    finder.IncludeModule(f"{name}.QtMultimediaWidgets")
-    copy_qt_plugins("mediaservice", finder, qtcore)
-
-
-def load_PyQt5_QtPrintSupport(finder: ModuleFinder, module: Module) -> None:
-    if module.in_file_system:
-        return
-    _, qtcore = _qt_implementation(module)
-    copy_qt_plugins("printsupport", finder, qtcore)
-
-
 def load_reportlab(finder: ModuleFinder, module: Module) -> None:
     """
     The reportlab module loads a submodule rl_settings via exec so force
@@ -1048,7 +1104,7 @@ def load_scipy_linalg(finder: ModuleFinder, module: Module) -> None:
     The scipy.linalg module loads items within itself in a way that causes
     problems without the entire package being present.
     """
-    module.AddGlobalName("norm")
+    module.global_names.add("norm")
     finder.IncludePackage("scipy.linalg")
 
 
@@ -1059,7 +1115,7 @@ def load_scipy_linalg_interface_gen(
     The scipy.linalg.interface_gen module optionally imports the pre module;
     ignore the error if this module cannot be found.
     """
-    module.IgnoreName("pre")
+    module.ignore_names.add("pre")
 
 
 def load_scipy_ndimage(finder: ModuleFinder, module: Module) -> None:
@@ -1078,7 +1134,7 @@ def load_scipy_sparse_linalg_dsolve_linsolve(
     finder: ModuleFinder, module: Module
 ) -> None:
     """The scipy.linalg.dsolve.linsolve optionally loads scikits.umfpack."""
-    module.IgnoreName("scikits.umfpack")
+    module.ignore_names.add("scikits.umfpack")
 
 
 def load_scipy_special(finder: ModuleFinder, module: Module) -> None:
@@ -1092,7 +1148,7 @@ def load_scipy_special__cephes(finder: ModuleFinder, module: Module) -> None:
     imports * from it in places; advertise the global names that are used
     in order to avoid spurious errors about missing modules.
     """
-    module.AddGlobalName("gammaln")
+    module.global_names.add("gammaln")
 
 
 def load_setuptools(finder: ModuleFinder, module: Module) -> None:
@@ -1108,7 +1164,7 @@ def load_setuptools_extension(finder: ModuleFinder, module: Module) -> None:
     The setuptools.extension module optionally loads
     Pyrex.Distutils.build_ext but its absence is not considered an error.
     """
-    module.IgnoreName("Pyrex.Distutils.build_ext")
+    module.ignore_names.add("Pyrex.Distutils.build_ext")
 
 
 def load_site(finder: ModuleFinder, module: Module) -> None:
@@ -1116,8 +1172,7 @@ def load_site(finder: ModuleFinder, module: Module) -> None:
     The site module optionally loads the sitecustomize and usercustomize
     modules; ignore the error if these modules do not exist.
     """
-    module.IgnoreName("sitecustomize")
-    module.IgnoreName("usercustomize")
+    module.ignore_names.update(["sitecustomize", "usercustomize"])
 
 
 def load_sqlite3(finder: ModuleFinder, module: Module) -> None:
@@ -1220,9 +1275,7 @@ def load_twitter(finder: ModuleFinder, module: Module) -> None:
     module in an attempt to locate any module that will implement the
     necessary protocol; ignore these modules if they cannot be found.
     """
-    module.IgnoreName("json")
-    module.IgnoreName("simplejson")
-    module.IgnoreName("django.utils")
+    module.ignore_names.update(["json", "simplejson", "django.utils"])
 
 
 def load_uvloop(finder: ModuleFinder, module: Module) -> None:
@@ -1319,7 +1372,13 @@ def load_zmq(finder: ModuleFinder, module: Module) -> None:
     """
     finder.IncludePackage("zmq.backend.cython")
     if WIN32:
-        # Not sure yet if this is cross platform
+        # For pyzmq 22 the libzmq dependencies are located in
+        # site-packages/pyzmq.libs
+        libzmq_folder = "pyzmq.libs"
+        libs_dir = os.path.join(os.path.dirname(module.path[0]), libzmq_folder)
+        if os.path.exists(libs_dir):
+            finder.IncludeFiles(libs_dir, os.path.join("lib", libzmq_folder))
+            return
         # Include the bundled libzmq library, if it exists
         try:
             libzmq = __import__("zmq", fromlist=["libzmq"]).libzmq
@@ -1327,8 +1386,8 @@ def load_zmq(finder: ModuleFinder, module: Module) -> None:
             finder.IncludeFiles(
                 os.path.join(module.path[0], filename), filename
             )
-        except ImportError:
-            pass  # No bundled libzmq library
+        except (ImportError, AttributeError):
+            pass  # assume libzmq is not bundled
 
 
 def load_zoneinfo(finder: ModuleFinder, module: Module) -> None:
@@ -1344,7 +1403,7 @@ def load_zoneinfo(finder: ModuleFinder, module: Module) -> None:
     if tzdata is None:
         return
     # store tzdata along with zoneinfo
-    tzdata.store_in_file_system = module.in_file_system
+    tzdata.in_file_system = module.in_file_system
     if tzdata.in_file_system:
         finder.IncludeFiles(
             tzdata.path[0],
@@ -1371,7 +1430,7 @@ def missing_gdk(finder: ModuleFinder, caller: Module) -> None:
     The gdk module is buried inside gtk so there is no need to concern
     ourselves with an error saying that it cannot be found.
     """
-    caller.IgnoreName("gdk")
+    caller.ignore_names.add("gdk")
 
 
 def missing_ltihooks(finder: ModuleFinder, caller: Module) -> None:
@@ -1379,7 +1438,7 @@ def missing_ltihooks(finder: ModuleFinder, caller: Module) -> None:
     This module is not necessairly present so ignore it when it cannot be
     found.
     """
-    caller.IgnoreName("ltihooks")
+    caller.ignore_names.add("ltihooks")
 
 
 def missing_readline(finder: ModuleFinder, caller: Module) -> None:
@@ -1388,4 +1447,4 @@ def missing_readline(finder: ModuleFinder, caller: Module) -> None:
     so instead of excluding it completely, ignore it if it can't be found.
     """
     if WIN32:
-        caller.IgnoreName("readline")
+        caller.ignore_names.add("readline")

@@ -16,7 +16,8 @@ the issue tracker.
 Setup
 -----
 
-The source code can be found on `Github <https://github.com/marcelotduarte/cx_Freeze>`_.
+The source code can be found on
+`Github <https://github.com/marcelotduarte/cx_Freeze>`_.
 
 You can use ``git`` to clone the repository:
 
@@ -25,6 +26,8 @@ You can use ``git`` to clone the repository:
       git clone https://github.com/marcelotduarte/cx_Freeze
       cd cx_Freeze
 
+Please check the requirements for python and for your system
+(see :doc:`../installation`).
 
 Building documentation
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -36,12 +39,12 @@ written in reStructuredText. To build it locally, run:
 
       make -C doc
 
-The built documentation can be found in the ``doc/build/html`` folder and may
+The built documentation can be found in the ``build/doc/html`` folder and may
 be viewed by opening ``index.html`` within that folder.
 
 .. code-block:: console
 
-      firefox doc/build/html/index.html
+      firefox build/doc/html/index.html
 
 
 Contributing
@@ -50,7 +53,7 @@ Contributing
 Submitting pull requests
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Submit pull requests against the ``master`` branch, providing a good
+Submit pull requests against the ``main`` branch, providing a good
 description of what you're doing and why. You must have legal permission to
 distribute any code you contribute to cx_Freeze and it must be available under
 the PSF License.

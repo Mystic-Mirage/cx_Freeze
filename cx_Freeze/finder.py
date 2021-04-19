@@ -8,12 +8,13 @@ import importlib.machinery
 import logging
 import os
 import sys
+from tempfile import TemporaryDirectory
 from types import CodeType
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import opcode
 
-from cx_Freeze.common import code_object_replace
-from cx_Freeze.module import Module
+from .common import code_object_replace
+from .module import Module
 
 
 BUILD_LIST = opcode.opmap["BUILD_LIST"]
@@ -33,6 +34,8 @@ __all__ = ["Module", "ModuleFinder"]
 
 
 class ModuleFinder:
+    """ModuleFinder base class."""
+
     def __init__(
         self,
         include_files: Optional[List[str]] = None,
@@ -58,13 +61,12 @@ class ModuleFinder:
         self.modules = []
         self.aliases = {}
         self.exclude_dependent_files = {}
-        self._modules = dict.fromkeys(
-            excludes or []
-        )  # type: Dict[str, Optional[Module]]
+        self._modules: Dict[str, Any] = dict.fromkeys(excludes or [])
         self._builtin_modules = dict.fromkeys(sys.builtin_module_names)
         self._bad_modules = {}
         self._hooks = __import__("cx_Freeze", fromlist=["hooks"]).hooks
         self._hooks.initialize(self)
+        self.dist_cachedir = TemporaryDirectory(prefix="cxfreeze")
         self._add_base_modules()
 
     def _add_base_modules(self) -> None:
@@ -98,10 +100,13 @@ class ModuleFinder:
         """
         Add a module to the list of modules but if one is already found,
         then return it instead; this is done so that packages can be
-        handled properly."""
+        handled properly.
+        """
         module = self._modules.get(name)
         if module is None:
-            module = Module(name, path, file_name, parent)
+            module = Module(
+                name, path, file_name, parent, rootcachedir=self.dist_cachedir
+            )
             self._modules[name] = module
             self.modules.append(module)
             if name in self._bad_modules:
@@ -114,7 +119,7 @@ class ModuleFinder:
                 and module.name not in self.zip_exclude_packages
                 or module.name in self.zip_include_packages
             ):
-                module.store_in_file_system = False
+                module.in_file_system = False
         if module.path is None and path is not None:
             module.path = path
         if module.file is None and file_name is not None:
@@ -302,7 +307,8 @@ class ModuleFinder:
         """
         Internal method used for importing a module which assumes that the
         name given is an absolute name. None is returned if the module
-        cannot be found."""
+        cannot be found.
+        """
         try:
             # Check in module cache before trying to import it again.
             return self._modules[name]
@@ -377,6 +383,19 @@ class ModuleFinder:
                 # It's recommended to clear the caches first.
                 importlib.machinery.PathFinder.invalidate_caches()
                 spec = importlib.machinery.PathFinder.find_spec(name, path)
+            except KeyError:
+                if parent:
+                    # some packages use a directory with vendored modules
+                    # without an __init__py and are not considered namespace
+                    # packages, then simulate a subpackage
+                    path = [os.path.join(path[0], name.rpartition(".")[-1])]
+                    origin = os.path.join(path[0], "__init__.py")
+                    module = self._add_module(name, path=path, parent=parent)
+                    logging.debug("Adding module [%s] [PACKAGE]", name)
+                    module.code = compile("", origin, "exec")
+                    module.in_import = False
+                    return module
+                spec = None
             except Exception:
                 spec = None
             if spec is None:
@@ -387,7 +406,7 @@ class ModuleFinder:
                 return None
             if loader is importlib.machinery.FrozenImporter:
                 return None
-            # Load package or namespae package
+            # Load package or namespace package
             if spec.submodule_search_locations:
                 path_list = list(spec.submodule_search_locations)
                 module = self._add_module(name, path=path_list, parent=parent)
@@ -395,6 +414,7 @@ class ModuleFinder:
                     logging.debug("Adding module [%s] [NAMESPACE]", name)
                     path = os.path.join(path_list[0], "__init__.py")
                     module.code = compile("", path, "exec")
+                    module.in_import = False
                     return module
                 logging.debug("Adding module [%s] [PACKAGE]", name)
                 path = spec.origin  # path of __init__
@@ -413,7 +433,9 @@ class ModuleFinder:
                 )
             except SyntaxError:
                 logging.debug("Invalid syntax in [%s]", name)
-                raise ImportError(f"Invalid syntax in {path}", name=name)
+                raise ImportError(
+                    f"Invalid syntax in {path}", name=name
+                ) from None
         elif isinstance(loader, importlib.machinery.SourcelessFileLoader):
             logging.debug("Adding module [%s] [BYTECODE]", name)
             # Load Python bytecode
@@ -602,15 +624,25 @@ class ModuleFinder:
         self.aliases[name] = alias_for
 
     def AddConstant(self, name: str, value: str) -> None:
+        """
+        Makes available a constant in the module BUILD_CONSTANTS which is used
+        in the initscripts.
+        """
         self.constants_module.values[name] = value
 
     def ExcludeDependentFiles(self, filename: str) -> None:
         self.exclude_dependent_files[filename] = None
 
     def ExcludeModule(self, name: str) -> None:
-        """Exclude the named module from the resulting frozen executable."""
-        self.excludes[name] = None
-        self._modules[name] = None
+        """
+        Exclude the named module and its submodules from the resulting frozen
+        executable."""
+        modules_to_exclude = [name] + [
+            mod for mod in self._modules if mod.startswith(f"{name}.")
+        ]
+        for mod in modules_to_exclude:
+            self.excludes[mod] = None
+            self._modules[mod] = None
 
     def IncludeFile(self, path: str, name: Optional[str] = None) -> Module:
         """Include the named file as a module in the frozen executable."""
@@ -634,6 +666,12 @@ class ModuleFinder:
 
     def IncludeModule(self, name: str) -> Module:
         """Include the named module in the frozen executable."""
+        # includes has priority over excludes
+        if name in self.excludes and name in self._modules:
+            if self._modules[name] is None:
+                self.excludes.pop(name)
+                self._modules.pop(name)
+        # include module
         deferred_imports: DeferredList = []
         module = self._import_module(name, deferred_imports)
         self._import_deferred_imports(deferred_imports, skip_in_import=True)
@@ -665,7 +703,7 @@ class ModuleFinder:
                 "may not be needed on this platform.\n"
             )
 
-    def SetOptimizeFlag(self, optimize_flag):
+    def SetOptimizeFlag(self, optimize_flag: int) -> int:
         """Set a new value of optimize flag and returns the previous value."""
         previous = self.optimize_flag
         # The value of optimize_flag is propagated according to the user's
@@ -676,5 +714,7 @@ class ModuleFinder:
         return previous
 
     def ZipIncludeFiles(self, source_path, target_path):
-        """Include the file(s) in the library.zip"""
+        """
+        Include files or all of the files in a directory to the zip file.
+        """
         self.zip_includes.append((source_path, target_path))
