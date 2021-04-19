@@ -149,6 +149,10 @@ class Executable:
                     ext = ".exe"
             else:
                 ext = ""
+
+        if os.path.splitext(os.path.basename(self._base))[0] == "ConsoleLib":
+            name = os.path.join("lib", name)
+
         self._name = name
         self._ext = ext
         name = name.partition(".")[0]
